@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT}:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '${ADMINER_PORT}:8080'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  metabase:
+    image: metabase/metabase
+    restart: always
+    environment:
+      MB_DB_FILE: '${MB_DB_FILE}'
+      MB_DB_TYPE: 'postgres'
+      MB_DB_DBNAME: '${DB_NAME}'
+      MB_DB_PORT: '5432'
+      MB_DB_USER: '${DB_USER}'
+      MB_DB_HOST: 'db'
+      MB_DB_PASS: '${DB_PASSWORD}'
+      JAVA_TIMEZONE: '${MB_JAVA_TIMEZONE}'
+    ports:
+      - '${MB_PORT}:3000'
+    volumes:
+      - 'mb-data:/metabase-data'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile-fastapi
+    restart: always
+    ports:
+      - '${FASTAPI_PORT}:8000'
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+  mb-data:
+
+networks:
+  app-network:
+    driver: bridge
