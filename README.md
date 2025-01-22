@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # How to Set Up the Tech Stack Using Your GitHub Repository
 
 This guide will help you set up the tech stack (PostgreSQL, Adminer, Metabase, FastAPI) using your GitHub repository. Follow these steps carefully!
@@ -89,11 +88,3 @@ You’ve successfully set up a tech stack with PostgreSQL, Adminer, Metabase, an
   ```
 - Make sure Docker is running and all files are in the correct folder.
 
----
-
-Let me know if you need help with anything else! 😊
-=======
-# docker-tech-stack
-
-git clone https://github.com/svenmagnuscarlsson/docker-tech-stack.git
->>>>>>> a503bafe814dbe812cad2725481dcef6e1a59473
